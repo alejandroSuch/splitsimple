@@ -60,27 +60,58 @@ El script se ejecuta automáticamente cada domingo a las 2 AM UTC mediante GitHu
 
 Para que el workflow automático funcione, necesitas configurar secretos en GitHub:
 
-#### Secretos para Notificaciones por Email
+#### Secretos para Notificaciones por Telegram
 
-El workflow envía un email automático al finalizar (éxito o fallo). Configura estos secretos:
+El workflow envía notificaciones a Telegram al finalizar (éxito o fallo). Configura estos secretos:
 
-1. **`SMTP_USERNAME`**: Tu dirección de Gmail (ej: `tu-email@gmail.com`)
-2. **`SMTP_PASSWORD`**: App Password de Gmail (NO tu contraseña normal)
-3. **`NOTIFICATION_EMAIL`**: Email donde quieres recibir las notificaciones
+**1. Crear un Bot de Telegram**
 
-**Cómo obtener App Password de Gmail:**
+1. Abre Telegram y busca **@BotFather**
+2. Envía el comando: `/newbot`
+3. Sigue las instrucciones:
+   - Nombre del bot: `SplitSimple Notifications` (o el que quieras)
+   - Username del bot: `splitsimple_notif_bot` (debe terminar en `_bot`)
+4. @BotFather te dará un **token** como: `123456789:ABCdefGHIjklMNOpqrsTUVwxyz`
+5. **Guarda este token** - lo necesitarás para GitHub Secrets
 
-1. Ve a tu [cuenta de Google](https://myaccount.google.com/)
-2. Seguridad → Verificación en 2 pasos (debe estar habilitada)
-3. Contraseñas de aplicaciones
-4. Selecciona "Correo" y "Otro (nombre personalizado)"
-5. Escribe "SplitSimple GitHub Actions"
-6. Copia la contraseña generada (16 caracteres sin espacios)
-7. Úsala como `SMTP_PASSWORD`
+**2. Obtener tu Chat ID**
 
-**Alternativas a Gmail:**
-- SendGrid, Mailgun, AWS SES (configuración similar)
-- Cambiar `server_address` y `server_port` en el workflow
+Opción A - Usando @userinfobot (más fácil):
+1. Busca **@userinfobot** en Telegram
+2. Envía cualquier mensaje
+3. Te responderá con tu Chat ID (es un número)
+
+Opción B - Usando la API:
+1. Envía un mensaje cualquiera a tu nuevo bot
+2. Abre esta URL en tu navegador (reemplaza `<TU_TOKEN>` con el token que te dio @BotFather):
+   ```
+   https://api.telegram.org/bot<TU_TOKEN>/getUpdates
+   ```
+3. Busca en la respuesta JSON: `"chat":{"id":123456789`
+4. Ese número es tu Chat ID
+
+**3. Configurar Secretos en GitHub**
+
+Ve a tu repositorio: **Settings** → **Secrets and variables** → **Actions** → **New repository secret**
+
+Crea estos dos secretos:
+
+- **`TELEGRAM_BOT_TOKEN`**: El token completo que te dio @BotFather
+  - Ejemplo: `123456789:ABCdefGHIjklMNOpqrsTUVwxyz`
+
+- **`TELEGRAM_CHAT_ID`**: Tu Chat ID (número)
+  - Ejemplo: `123456789`
+
+**4. Probar las Notificaciones**
+
+Ejecuta el workflow manualmente desde GitHub Actions para probar que recibes las notificaciones en Telegram.
+
+**Ventajas de Telegram:**
+- ✅ Sin credenciales personales (email/password)
+- ✅ Notificaciones push instantáneas en móvil
+- ✅ Completamente gratuito
+- ✅ Muy fácil de configurar
+- ✅ Puedes silenciar el bot si es necesario
 
 #### Secretos para Firebase
 

@@ -171,7 +171,7 @@ Los grupos inactivos se eliminan automáticamente para mantener la base de datos
 - **Frecuencia**: Se ejecuta cada domingo a las 2 AM UTC
 - **Método**: GitHub Actions + Firebase Admin SDK
 - **Costo**: $0 (100% gratuito)
-- **Notificaciones**: Envía email al finalizar (éxito o error)
+- **Notificaciones**: Telegram (éxito o error)
 
 ### Cómo funciona
 
@@ -179,7 +179,7 @@ Los grupos inactivos se eliminan automáticamente para mantener la base de datos
 2. El script conecta a Firestore usando Firebase Admin SDK
 3. Busca grupos donde `lastActivity` > 30 días
 4. Elimina el grupo y todos sus gastos asociados
-5. Envía email de notificación con el resultado
+5. Envía notificación a Telegram con el resultado
 
 ### Configuración
 
@@ -187,7 +187,7 @@ Ver documentación completa en [`scripts/README.md`](./scripts/README.md)
 
 **Requisitos** (secretos de GitHub):
 - Credenciales de Firebase (service account)
-- Credenciales SMTP para notificaciones por email
+- Bot de Telegram (token y chat ID)
 
 ### Ejecución manual
 

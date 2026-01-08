@@ -32,6 +32,7 @@ jobs:
         run: npm ci
 
       - name: Run cleanup script
+        id: cleanup
         env:
           # Firebase credentials (use service account if available, fallback to individual secrets)
           FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
@@ -40,55 +41,42 @@ jobs:
           FIREBASE_PRIVATE_KEY: ${{ secrets.FIREBASE_PRIVATE_KEY }}
         run: npm run cleanup
 
-      - name: Send success email
+      # ============================================================
+      # TELEGRAM NOTIFICATIONS
+      # ============================================================
+      # Envía notificación a Telegram al finalizar (éxito o fallo)
+      #
+      # CONFIGURACIÓN REQUERIDA:
+      # 1. Crear bot con @BotFather en Telegram:
+      #    - Envía: /newbot
+      #    - Sigue las instrucciones
+      #    - Guarda el token que te da
+      #
+      # 2. Obtener tu Chat ID:
+      #    - Envía un mensaje a tu bot
+      #    - Visita: https://api.telegram.org/bot<TU_TOKEN>/getUpdates
+      #    - Busca "chat":{"id": XXXXXXX
+      #    - O usa @userinfobot para obtener tu ID
+      #
+      # 3. Configurar secretos en GitHub:
+      #    - TELEGRAM_BOT_TOKEN: El token de @BotFather
+      #    - TELEGRAM_CHAT_ID: Tu Chat ID (número)
+      #
+      # Documentación: https://core.telegram.org/bots/api
+      # ============================================================
+
+      - name: Send Telegram notification (Success)
         if: success()
-        uses: dawidd6/action-send-mail@v3
-        with:
-          server_address: smtp.gmail.com
-          server_port: 465
-          secure: true
-          username: ${{ secrets.SMTP_USERNAME }}
-          password: ${{ secrets.SMTP_PASSWORD }}
-          subject: '✅ SplitSimple: Cleanup completado exitosamente'
-          to: ${{ secrets.NOTIFICATION_EMAIL }}
-          from: SplitSimple Automation <${{ secrets.SMTP_USERNAME }}>
-          body: |
-            El proceso de limpieza de grupos antiguos se ha completado exitosamente.
+        run: |
+          curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
+            -d chat_id="${{ secrets.TELEGRAM_CHAT_ID }}" \
+            -d parse_mode="HTML" \
+            -d text="<b>✅ SplitSimple: Cleanup Exitoso</b>%0A%0A🧹 El proceso de limpieza de grupos antiguos se completó correctamente.%0A%0A📅 <b>Fecha:</b> $(date -u +'%Y-%m-%d %H:%M:%S UTC')%0A🔗 <b>Ver detalles:</b> ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}%0A%0A<i>Revisa los logs para ver cuántos grupos fueron eliminados.</i>"
 
-            ✅ Estado: Exitoso
-            📅 Fecha: ${{ github.event.head_commit.timestamp }}
-            🔗 Ver detalles: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-
-            Revisa los logs de GitHub Actions para ver cuántos grupos fueron eliminados.
-
-            ---
-            Este es un mensaje automático de SplitSimple.
-
-      - name: Send failure email
+      - name: Send Telegram notification (Failure)
         if: failure()
-        uses: dawidd6/action-send-mail@v3
-        with:
-          server_address: smtp.gmail.com
-          server_port: 465
-          secure: true
-          username: ${{ secrets.SMTP_USERNAME }}
-          password: ${{ secrets.SMTP_PASSWORD }}
-          subject: '❌ SplitSimple: Error en cleanup de grupos'
-          to: ${{ secrets.NOTIFICATION_EMAIL }}
-          from: SplitSimple Automation <${{ secrets.SMTP_USERNAME }}>
-          body: |
-            ⚠️ El proceso de limpieza de grupos antiguos ha fallado.
-
-            ❌ Estado: Fallido
-            📅 Fecha: ${{ github.event.head_commit.timestamp }}
-            🔗 Ver detalles: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-
-            Por favor, revisa los logs de GitHub Actions para identificar el problema.
-
-            Posibles causas:
-            - Credenciales de Firebase incorrectas o expiradas
-            - Problemas de permisos en Firestore
-            - Error de red o timeout
-
-            ---
-            Este es un mensaje automático de SplitSimple.
+        run: |
+          curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
+            -d chat_id="${{ secrets.TELEGRAM_CHAT_ID }}" \
+            -d parse_mode="HTML" \
+            -d text="<b>❌ SplitSimple: Error en Cleanup</b>%0A%0A⚠️ El proceso de limpieza ha fallado.%0A%0A📅 <b>Fecha:</b> $(date -u +'%Y-%m-%d %H:%M:%S UTC')%0A🔗 <b>Ver logs:</b> ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}%0A%0A<b>Posibles causas:</b>%0A• Credenciales de Firebase incorrectas%0A• Problemas de permisos en Firestore%0A• Error de red o timeout%0A%0A<i>Por favor revisa los logs de GitHub Actions.</i>"

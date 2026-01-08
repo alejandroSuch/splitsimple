@@ -11,10 +11,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - GitHub Actions workflow for automatic cleanup of old groups (30+ days inactive)
 - Node.js script `scripts/cleanup-groups.js` for automated group deletion using Firebase Admin SDK
 - Scheduled weekly cleanup job running on Sundays at 2 AM UTC
-- Email notifications on cleanup completion (success or failure)
+- Telegram Bot notifications on cleanup completion (success or failure)
 - Detailed logging of deleted groups and expenses
-- Documentation in `scripts/README.md` for cleanup system configuration
+- Comprehensive documentation in `scripts/README.md` with Telegram setup guide
 - `CHANGELOG.md` for tracking project changes
+- Inline documentation in workflow file for easy Telegram Bot configuration
 
 ### Changed
 - Group cleanup period reduced from 90 days to 30 days of inactivity
