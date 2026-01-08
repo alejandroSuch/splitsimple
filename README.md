@@ -9,7 +9,7 @@ Una aplicación web simple y moderna para compartir y dividir gastos entre amigo
 - 🔗 Compartir grupos mediante link único
 - ✍️ Cualquiera con el link puede agregar/editar/eliminar gastos
 - 💶 Cálculo automático de balances (quién debe a quién)
-- 🧹 Auto-eliminación de grupos después de 90 días sin actividad
+- 🧹 Auto-eliminación automática de grupos después de 30 días sin actividad (GitHub Actions)
 - 📱 Diseño responsive y moderno
 
 ## 🚀 Stack Tecnológico
@@ -19,6 +19,7 @@ Una aplicación web simple y moderna para compartir y dividir gastos entre amigo
 - **Backend**: Firebase (Firestore + Authentication)
 - **Hosting**: GitHub Pages
 - **Deployment**: GitHub Actions (CI/CD automático)
+- **Automation**: GitHub Actions para limpieza automática de grupos antiguos
 
 > **Nota sobre URLs**: La app usa HashRouter (`/#/route`) para compatibilidad con GitHub Pages. Esto garantiza que los links compartidos y el refresh funcionen correctamente. Ver [ROUTING_SOLUTION.md](./ROUTING_SOLUTION.md) para más detalles.
 
@@ -160,13 +161,47 @@ Resultado:
 
 Transacción óptima: María → Juan: €20
 
+## 🤖 Sistema de Limpieza Automática
+
+Los grupos inactivos se eliminan automáticamente para mantener la base de datos limpia.
+
+### Características
+
+- **Período**: Grupos con más de 30 días sin actividad
+- **Frecuencia**: Se ejecuta cada domingo a las 2 AM UTC
+- **Método**: GitHub Actions + Firebase Admin SDK
+- **Costo**: $0 (100% gratuito)
+- **Notificaciones**: Envía email al finalizar (éxito o error)
+
+### Cómo funciona
+
+1. GitHub Actions ejecuta un workflow programado semanalmente
+2. El script conecta a Firestore usando Firebase Admin SDK
+3. Busca grupos donde `lastActivity` > 30 días
+4. Elimina el grupo y todos sus gastos asociados
+5. Envía email de notificación con el resultado
+
+### Configuración
+
+Ver documentación completa en [`scripts/README.md`](./scripts/README.md)
+
+**Requisitos** (secretos de GitHub):
+- Credenciales de Firebase (service account)
+- Credenciales SMTP para notificaciones por email
+
+### Ejecución manual
+
+Puedes ejecutar la limpieza manualmente desde:
+- GitHub Actions → Workflow "Cleanup Old Groups" → Run workflow
+- Localmente: `npm run cleanup` (requiere `.env.local`)
+
 ## 🔐 Seguridad
 
 - Las API keys de Firebase son públicas por diseño
 - La seguridad se maneja mediante reglas de Firestore
 - Solo usuarios autenticados pueden crear grupos
 - Cualquiera con el link puede editar gastos (requisito de diseño)
-- Los grupos se auto-eliminan después de 90 días sin actividad
+- Los grupos se auto-eliminan después de 30 días sin actividad (GitHub Actions)
 
 ## 📝 Reglas de Firestore
 

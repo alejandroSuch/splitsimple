@@ -1,0 +1,94 @@
+name: Cleanup Old Groups
+
+on:
+  # Run every Sunday at 2 AM UTC
+  schedule:
+    - cron: '0 2 * * 0'
+
+  # Allow manual trigger from GitHub Actions tab
+  workflow_dispatch:
+
+# Prevent concurrent executions
+concurrency:
+  group: cleanup-old-groups
+  cancel-in-progress: false
+
+jobs:
+  cleanup:
+    name: Delete groups inactive for 30+ days
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run cleanup script
+        env:
+          # Firebase credentials (use service account if available, fallback to individual secrets)
+          FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
+          VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+          FIREBASE_CLIENT_EMAIL: ${{ secrets.FIREBASE_CLIENT_EMAIL }}
+          FIREBASE_PRIVATE_KEY: ${{ secrets.FIREBASE_PRIVATE_KEY }}
+        run: npm run cleanup
+
+      - name: Send success email
+        if: success()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          secure: true
+          username: ${{ secrets.SMTP_USERNAME }}
+          password: ${{ secrets.SMTP_PASSWORD }}
+          subject: '✅ SplitSimple: Cleanup completado exitosamente'
+          to: ${{ secrets.NOTIFICATION_EMAIL }}
+          from: SplitSimple Automation <${{ secrets.SMTP_USERNAME }}>
+          body: |
+            El proceso de limpieza de grupos antiguos se ha completado exitosamente.
+
+            ✅ Estado: Exitoso
+            📅 Fecha: ${{ github.event.head_commit.timestamp }}
+            🔗 Ver detalles: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+            Revisa los logs de GitHub Actions para ver cuántos grupos fueron eliminados.
+
+            ---
+            Este es un mensaje automático de SplitSimple.
+
+      - name: Send failure email
+        if: failure()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          secure: true
+          username: ${{ secrets.SMTP_USERNAME }}
+          password: ${{ secrets.SMTP_PASSWORD }}
+          subject: '❌ SplitSimple: Error en cleanup de grupos'
+          to: ${{ secrets.NOTIFICATION_EMAIL }}
+          from: SplitSimple Automation <${{ secrets.SMTP_USERNAME }}>
+          body: |
+            ⚠️ El proceso de limpieza de grupos antiguos ha fallado.
+
+            ❌ Estado: Fallido
+            📅 Fecha: ${{ github.event.head_commit.timestamp }}
+            🔗 Ver detalles: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+            Por favor, revisa los logs de GitHub Actions para identificar el problema.
+
+            Posibles causas:
+            - Credenciales de Firebase incorrectas o expiradas
+            - Problemas de permisos en Firestore
+            - Error de red o timeout
+
+            ---
+            Este es un mensaje automático de SplitSimple.
