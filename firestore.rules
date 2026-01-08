@@ -1,0 +1,22 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Grupos: solo el creador puede crear, todos con el ID pueden leer/escribir
+    match /groups/{groupId} {
+      allow read: if true; // cualquiera con el link puede leer
+      allow create: if request.auth != null; // solo usuarios autenticados crean
+      allow update, delete: if true; // cualquiera puede modificar (requisito)
+
+      // Gastos dentro de un grupo
+      match /expenses/{expenseId} {
+        allow read, write: if true; // cualquiera con el link puede editar
+      }
+    }
+
+    // Usuarios: solo el propio usuario puede leer/escribir
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+  }
+}

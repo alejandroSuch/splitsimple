@@ -1,0 +1,136 @@
+.balance-container h2 {
+  margin: 0 0 20px 0;
+  color: #333;
+  font-size: 1.5rem;
+}
+
+.balance-container h3 {
+  margin: 0 0 15px 0;
+  color: #555;
+  font-size: 1.1rem;
+}
+
+.summary-box {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 25px;
+  color: white;
+}
+
+.summary-item {
+  display: flex;
+  justify-content: space-between;
+  margin: 10px 0;
+}
+
+.summary-label {
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+.summary-value {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.balances-section {
+  margin-bottom: 25px;
+}
+
+.balance-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.balance-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 15px;
+  background: #f8f9fa;
+  border-radius: 6px;
+}
+
+.person-name {
+  font-weight: 500;
+  color: #333;
+}
+
+.balance-amount {
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.balance-amount.positive {
+  color: #27ae60;
+}
+
+.balance-amount.negative {
+  color: #e74c3c;
+}
+
+.balance-amount.neutral {
+  color: #95a5a6;
+}
+
+.transactions-section {
+  margin-top: 25px;
+  padding-top: 25px;
+  border-top: 2px solid #e0e0e0;
+}
+
+.transaction-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.transaction-item {
+  background: #fff3cd;
+  border-left: 4px solid #ffc107;
+  padding: 15px;
+  border-radius: 6px;
+}
+
+.transaction-flow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.from-person,
+.to-person {
+  font-weight: 500;
+  color: #333;
+}
+
+.arrow {
+  color: #ffc107;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.transaction-amount {
+  display: block;
+  color: #e67e22;
+  font-weight: 600;
+  font-size: 18px;
+}
+
+.all-settled {
+  text-align: center;
+  padding: 30px;
+  color: #27ae60;
+  font-weight: 500;
+  font-size: 16px;
+}
+
+.empty-balance {
+  text-align: center;
+  padding: 40px 20px;
+  color: #999;
+}

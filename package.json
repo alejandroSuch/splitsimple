@@ -1,0 +1,32 @@
+{
+  "name": "splitsimple",
+  "version": "1.0.0",
+  "description": "App para compartir y dividir gastos entre personas",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist"
+  },
+  "keywords": ["expense", "split", "sharing"],
+  "author": "Alejandro Such",
+  "license": "MIT",
+  "homepage": "https://alejandroSuch.github.io/splitsimple",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:alejandroSuch/splitsimple.git"
+  },
+  "dependencies": {
+    "@vitejs/plugin-react": "^5.1.2",
+    "firebase": "^12.7.0",
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3",
+    "react-router-dom": "^7.11.0",
+    "vite": "^7.3.1"
+  },
+  "devDependencies": {
+    "gh-pages": "^6.3.0"
+  }
+}
